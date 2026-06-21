@@ -1,0 +1,596 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SCY Intelligence — CBT Practice Studio</title>
+<meta name="description" content="Timed CBT practice exams for PHY102, MTH102 and STA111 with topic-level feedback." />
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js" crossorigin></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  html, body, #root { height: 100%; margin: 0; }
+  .f-display { font-family: 'Space Grotesk', sans-serif; }
+  .f-mono { font-family: 'IBM Plex Mono', monospace; }
+  .f-body { font-family: 'Inter', sans-serif; }
+  @keyframes scy-pulse { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+  .scy-pulse { animation: scy-pulse 2.2s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce) { .scy-pulse { animation: none; } }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+const LOGO_SRC = "data:image/webp;base64,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";
+
+const PHY102_BANK = [{"q": "A pair of equal but opposite charge separated by a distance is called?", "options": ["Electric field", "Magnetic dipole", "Electric dipole", "Polarization"], "correct": 2, "topic": "Electrostatics"}, {"q": "If the distance between two charges is halved, how is the electric field affected?", "options": ["It doubles", "It becomes four times stronger", "It is halved", "It remains the same"], "correct": 1, "topic": "Electrostatics"}, {"q": "If two unit charges are separated in air by a distance of 1m, the force exerted between them is?", "options": ["9 × 10⁹ N", "1 N", "10⁹ N", "1.5 × 10⁸ N"], "correct": 0, "topic": "Electrostatics"}, {"q": "Magnetic field is what quantity?", "options": ["Scalar quantity", "Vector quantity", "Constant quantity", "Derived quantity"], "correct": 1, "topic": "Magnetism"}, {"q": "Sum of potential difference round any closed loop in a circuit must be zero. This is called?", "options": ["Kirchhoff’s voltage law", "Ohm’s law", "Ampere’s law", "Newton’s law"], "correct": 0, "topic": "Circuits & Resistance"}, {"q": "Determine the charge of a plate of 0.050μF when the potential difference is 200V?", "options": ["1.0 × 10⁻⁵ C", "2.5 × 10⁻⁵ C", "1.0 × 10⁻² C", "3.0 × 10⁻⁶ C"], "correct": 0, "topic": "Capacitance"}, {"q": "Calculate the resistance per length when the diameter is 0.4mm (ρ = 4.7)?", "options": ["37.4 Ω/m", "15.6 Ω/m", "4.7 Ω/m", "5.2 Ω/m"], "correct": 2, "topic": "Circuits & Resistance"}, {"q": "The factors affecting the capacitance of a capacitor are?", "options": ["Area, dielectric constant, distance of separation", "Temperature, wire length, voltage", "Plate thickness, temperature, wire length", "Material, wire gauge, temperature"], "correct": 0, "topic": "Capacitance"}, {"q": "Calculate the force of the magnetic field, given B = 5T, l = 100cm, I = 4A, θ = 30⁰", "options": ["10 N", "5 N", "8.66 N", "20 N"], "correct": 2, "topic": "Magnetism"}, {"q": "Calculate the magnetic field of perpendicular whatever given B = 0.5T, I = 5A and l = 200cm", "options": ["5 N", "2.5 N", "1 N", "10 N"], "correct": 0, "topic": "Magnetism"}, {"q": "Calculate the electric energy and power given R = 11Ω and potential difference = 220V and t = 2 secs.", "options": ["8.8 kJ, 4.4 kW", "4.4 kJ, 8.8 kW", "2.2 kJ, 8.2 kW", "8.5 kJ, 4.4 kW"], "correct": 0, "topic": "Energy & Power"}, {"q": "Given A = 2m², εo = 8.85 × 10⁻¹², d = 0.01m, calculate the capacitance.", "options": ["1.77 × 10⁻⁹ F", "1.50 × 10⁻⁹ F", "2.00 × 10⁻⁹ F", "1.00 × 10⁻⁹ F"], "correct": 0, "topic": "Capacitance"}, {"q": "Given E = 300 N/C and d = 0.01m, calculate the potential difference.", "options": ["3.0 V", "30 V", "0.003 V", "3000 V"], "correct": 0, "topic": "General Electricity & Magnetism"}, {"q": "If two charges 4μC and 6μC are separated by distance 0.3m, if the distance is doubled, what is the new magnitude of the force?", "options": ["1.2 N", "0.3 N", "0.6 N", "2.4 N"], "correct": 2, "topic": "Electrostatics"}, {"q": "A force q on another charge Q is represented by which formula?", "options": ["F = qQ/r²", "F = qQ × r²", "F = q + Q/r", "F = q − Q/r²"], "correct": 0, "topic": "Electrostatics"}, {"q": "The ratio of charge to potential difference across the plates of a capacitor is?", "options": ["Capacitance", "Resistance", "Inductance", "Voltage"], "correct": 0, "topic": "Capacitance"}, {"q": "Two resistors 16Ω and 8Ω are connected in series to a 12V battery. What is the voltage across each resistor?", "options": ["4V and 8V", "8V and 4V", "6V and 6V", "10V and 2V"], "correct": 1, "topic": "Circuits & Resistance"}, {"q": "Two capacitors 3μF and 6μF are connected in series to a 400V battery. What is the charge?", "options": ["800 μC", "1200 μC", "400 μC", "600 μC"], "correct": 0, "topic": "Capacitance"}, {"q": "Kirchhoff's current law states?", "options": ["Sum of currents entering a junction equals sum of currents leaving", "Voltage is directly proportional to current", "Force is equal to mass times acceleration", "Charge is conserved in a circuit"], "correct": 0, "topic": "Circuits & Resistance"}, {"q": "What direction will electric charge move if it is placed near a positive field?", "options": ["Away from the field", "Towards the field", "Neutral", "Random"], "correct": 0, "topic": "Electrostatics"}, {"q": "What is the ratio of charge per unit time?", "options": ["Electric potential", "Electric current", "Electric field", "Electric charge"], "correct": 1, "topic": "Electrostatics"}, {"q": "A voltage supply of 400V is connected across capacitors of 3μF and 6μF in series. Calculate the energy stored in 3μF.", "options": ["0.107 J", "0.2 J", "0.067 J", "0.15 J"], "correct": 0, "topic": "Capacitance"}, {"q": "The law that gives the magnetic field generated by a constant electric current is?", "options": ["Ampere’s law", "Coulomb’s law", "Biot-Savart law", "Ohm’s law"], "correct": 2, "topic": "Magnetism"}, {"q": "If two unit charges are separated in air by a distance of 1m, the force exerted between them is?", "options": ["9 × 10⁻¹⁹", "10⁻⁹", "9 × 10", "9 × 10⁻⁹"], "correct": 3, "topic": "Electrostatics"}, {"q": "Calculate the resistance per meter length of constantan wire (resistivity 4.7×10⁻⁵)?", "options": ["0.15 Ω/m", "0.37 Ω/m", "0.23 Ω/m", "0.42 Ω/m"], "correct": 2, "topic": "Circuits & Resistance"}, {"q": "Calculate the angle between the field of a current-carrying wire of length 200cm with a current 5A when placed in a magnetic field of 0.5T", "options": ["60°", "30°", "45°", "90°"], "correct": 1, "topic": "Magnetism"}, {"q": "Charge per unit time that flows through a region is?", "options": ["Electric power", "Electric current", "Electric field", "Electric force"], "correct": 1, "topic": "Electrostatics"}, {"q": "If two charges have a force of 5N each, if the distance is halved, what will be the new force?", "options": ["10 N", "20 N", "2.5 N", "5 N"], "correct": 1, "topic": "Electrostatics"}, {"q": "If the force is doubled, what will happen to the distance between two charges?", "options": ["It becomes halved", "It remains the same", "It becomes one-fourth", "It doubles"], "correct": 0, "topic": "Electrostatics"}, {"q": "Magnetic field is?", "options": ["Vector quantity", "Scalar quantity", "Scalar vector", "Null"], "correct": 0, "topic": "Magnetism"}, {"q": "The amount of charge covering a small region in space such that its dimensions are negligible compared to the point of observation is?", "options": ["Electric charge", "Universal charge", "Dielectrics", "Point charge"], "correct": 3, "topic": "Electrostatics"}, {"q": "If the distance between two charges is doubled, how does the electrostatic force between them change?", "options": ["It becomes four times weaker", "It becomes half as strong", "It becomes twice as strong", "It remains the same"], "correct": 0, "topic": "Electrostatics"}, {"q": "The ratio of electric charge to the potential difference between or across the plates of the capacitor is called the?", "options": ["Capacitance of a capacitor", "Resistance of the capacitor", "Energy stored", "Potential difference"], "correct": 0, "topic": "Capacitance"}, {"q": "Calculate the electrical charge and power used by an electric heater of 11Ω when the voltage source is 220V AC for 2 seconds.", "options": ["4.4 kJ, 8.8 kW", "8.8 kJ, 4.4 kW", "2.2 kJ, 8.2 kW", "8.5 kJ, 4.4 kW"], "correct": 1, "topic": "Energy & Power"}, {"q": "A parallel plate capacitor has a capacitance of 2.0μF. If the plate area is 0.5m² and εo = 8.85×10⁻¹² F/m, what is the separation between the plates?", "options": ["2.21 × 10⁻⁶ m", "1.5 × 10⁻⁶ m", "3.0 × 10⁻⁶ m", "4.4 × 10⁻⁶ m"], "correct": 0, "topic": "Capacitance"}, {"q": "The electric field between the plates of a capacitor is 200 N/C and the distance between the plates is 0.02m. What is the potential difference across the plates?", "options": ["2 V", "4 V", "8 V", "6 V"], "correct": 1, "topic": "Capacitance"}, {"q": "A parallel plate capacitor has a plate area of 2.0m² and a separation of 0.01m. If permittivity εo = 8.85×10⁻¹² F/m, what is the capacitance of the capacitor?", "options": ["1.77 × 10⁻⁹ F", "2.5 × 10⁻⁹ F", "3.0 × 10⁻⁹ F", "1.5 × 10⁻⁹ F"], "correct": 0, "topic": "Capacitance"}, {"q": "Charge per unit time that flows through a region?", "options": ["Electric potential", "Electric current", "Electric field", "Resistance"], "correct": 1, "topic": "Electrostatics"}, {"q": "Magnetic field that do not vary with time?", "options": ["Alternating magnetic field", "Magnetostatic field", "Transient magnetic field", "Oscillating field"], "correct": 1, "topic": "Magnetism"}, {"q": "Calculate the current in a 10m long straight wire placed in a uniform magnetic field of 0.05T with a force of 2.5N", "options": ["2A", "3A", "4A", "5A"], "correct": 3, "topic": "Magnetism"}, {"q": "Calculate the resistance per meter length of a constant wire of diameter 0.4mm and resistivity 4.70×10^-5", "options": ["294 ohms", "314 ohms", "374 ohms", "404 ohms"], "correct": 2, "topic": "Circuits & Resistance"}, {"q": "Two resistors 16.0 ohms and 8.0 ohms are connected in series across a 12.0 volts battery. What is the voltage across each resistor?", "options": ["4.0V and 8.0V", "6.0V and 6.0V", "8.0V and 4.0V", "10.0V and 2.0V"], "correct": 2, "topic": "Circuits & Resistance"}, {"q": "The law that gives the magnetic field generated by a constant electricity is?", "options": ["Ohm’s law", "Biot-Savart law", "Ampere’s circuital law", "Faraday’s law"], "correct": 1, "topic": "Magnetism"}, {"q": "Determine the charge of each plate of 0.050μF capacitor when the potential difference between the plates is 200V", "options": ["0.001 C", "0.01 C", "0.005 C", "0.01 C"], "correct": 1, "topic": "Capacitance"}, {"q": "A capacitor stores charge of 5.0×10^-6C when the potential difference across its plates is 100V. What is the capacitance of the capacitor?", "options": ["5.0×10^-8 F", "5.0×10^-7 F", "5.0×10^-6 F", "5.0×10^-5 F"], "correct": 0, "topic": "Capacitance"}, {"q": "The electric field between the plates of a capacitor is 200N/C and the distance between the plates is 0.02m. What is the potential difference across the plates?", "options": ["2V", "4V", "5V", "10V"], "correct": 1, "topic": "Capacitance"}, {"q": "A spherical surface of radius 0.5m encloses a charge of 2.0C. What is the electric flux through the surface (ε₀ = 8.85×10^-12)?", "options": ["1.13×10^11 Nm²/C", "2.26×10^11 Nm²/C", "3.39×10^11 Nm²/C", "4.52×10^11 Nm²/C"], "correct": 1, "topic": "Electrostatics"}, {"q": "Calculate the distance between two charges -2.0×10^-10C and +3.0×10^-6C if the magnitude of the force of attraction is 15N (k = 9×10^9)", "options": ["2.0×10^-2 m", "3.0×10^-2 m", "4.0×10^-2 m", "5.0×10^-2 m"], "correct": 2, "topic": "Electrostatics"}, {"q": "What is Magnetostatic Field?", "options": ["Time-varying magnetic field", "Magnetic field due to moving charges", "Magnetic field in stationary condition", "Electric field created by magnets"], "correct": 2, "topic": "Magnetism"}, {"q": "If the distance between two charges is doubled what happens to the electric potential energy?", "options": ["Halved", "Doubled", "Remains the same", "Quadrupled"], "correct": 0, "topic": "Energy & Power"}, {"q": "Magnetic force is \\_\\_\\_ quantity", "options": ["Scalar", "Partly scalar and partly vector", "Vector", "Fundamental"], "correct": 2, "topic": "General Electricity & Magnetism"}, {"q": "If the distance between two charges is halved, how does the electric potential energy change?", "options": ["It is doubled", "Remains the same", "It is halved", "It is quadrupled"], "correct": 0, "topic": "Energy & Power"}, {"q": "Magnetic field is a", "options": ["Vector quantity", "Scalar quantity", "Null quantity", "Partly vector and partly scalar"], "correct": 0, "topic": "Magnetism"}, {"q": "The sum of the potential difference round any closed loop in a circuit must be equal to zero. This is called", "options": ["Ohm’s law", "Kirchhoff’s law", "Circuital law", "None of the options"], "correct": 1, "topic": "Circuits & Resistance"}, {"q": "What is the electric potential energy at the point 0.5 m away from a charge of +2 microcoulomb when k = 9×10^9 N/C²", "options": ["9,000 volts", "36,000 volts", "18,000 volts", "4,500 volts"], "correct": 2, "topic": "Energy & Power"}, {"q": "A spherical surface of radius 0.5m encloses a charge Q = +2.0μC. What is the electric flux through the surface?", "options": ["2.26×10^5 Nm²/C", "4.52×10^5 Nm²/C", "1.13×10^5 Nm²/C", "3.39×10^5 Nm²/C"], "correct": 0, "topic": "Electrostatics"}, {"q": "Two point charges q1 = 3μC and q2 = -2μC are separated by a radius of 0.5m. Find the electrostatic force between them.", "options": ["0.2N", "0.4N", "0.6N", "0.8N"], "correct": 3, "topic": "Electrostatics"}, {"q": "If the distance between 2 charges is doubled, how does the electric field between them change?", "options": ["Remains the same", "Becomes half as strong", "Four times weaker", "Two times stronger"], "correct": 2, "topic": "Electrostatics"}, {"q": "Calculate the capacitance between two parallel plates separated by paraffin wax of 0.50cm and the area is 80cm². The dielectric constant of the wax is 2.", "options": ["2.8×10^-12 F", "2.8×10^-11 F", "2.8×10^-10 F", "2.8×10^-9 F"], "correct": 1, "topic": "Capacitance"}, {"q": "Calculate the distance between Q = -2μC and Q2 = 3μC, if the electrostatic force between them is 15N.", "options": ["0.1 m", "0.2 m", "0.3 m", "0.4 m"], "correct": 0, "topic": "Electrostatics"}, {"q": "Calculate the total capacitance of C1 = 3μF and C2 = 6μF that are arranged in series", "options": ["9μF", "None of the above", "18μF", "2μF"], "correct": 3, "topic": "Capacitance"}, {"q": "The ratio of electric charge to potential difference between or across the plates of a capacitor is called?", "options": ["Capacitance", "Resistance", "Inductance", "Conductance"], "correct": 0, "topic": "Capacitance"}, {"q": "Calculate the resistance per meter length of a constantan wire of diameter 0.4mm. Resistivity = 4.7×10⁻⁵", "options": ["374 Ω/m", "420 Ω/m", "310 Ω/m", "500 Ω/m"], "correct": 0, "topic": "Circuits & Resistance"}, {"q": "A capacitor has a plate separation of 0.07m and an electric field of 300N/C. What is the potential difference across the plates?", "options": ["10.5 V", "15 V", "21 V", "25.5 V"], "correct": 2, "topic": "Capacitance"}, {"q": "A capacitor has a capacitance of 10 microfarad and potential difference of 50V. Find the charge.", "options": ["0.0005 C", "0.005 C", "0.00005 C", "0.05 C"], "correct": 0, "topic": "Capacitance"}, {"q": "Kirchoff current rule states that?", "options": ["The voltage in a closed loop is zero", "The current entering a junction equals the current leaving", "The current in a circuit depends on resistance", "The power is proportional to voltage"], "correct": 1, "topic": "General Electricity & Magnetism"}, {"q": "The study of magnetic field that doesn't vary with time is called?", "options": ["Magnetostatics", "Electrodynamics", "Electrostatics", "Electromagnetism"], "correct": 0, "topic": "Magnetism"}, {"q": "Two charges exert a force of 5N on each other. What's the new force if the distance between them is halved?", "options": ["2.5 N", "10 N", "20 N", "40 N"], "correct": 2, "topic": "Electrostatics"}, {"q": "Formula for electric field due to a point charge", "options": ["E = q/r²", "E = kq/r²", "E = k/rq²", "E = kr/q²"], "correct": 1, "topic": "Electrostatics"}, {"q": "The amount of charge covering a small region in space such that its dimensions are negligible", "options": ["Point charge", "Electric dipole", "Electric field", "Potential difference"], "correct": 0, "topic": "Electrostatics"}, {"q": "Find the electrical energy and power if R = 11Ω, V = 220V, and t = 2s", "options": ["880 J, 440 W", "220 J, 110 W", "1200 J, 600 W", "400 J, 200 W"], "correct": 0, "topic": "Energy & Power"}, {"q": "Calculate the electrical energy and power used in an electric heater of 11 ohms when the voltage source is 220V AC for 2 seconds.", "options": ["880 J, 440 W", "500 J, 250 W", "1100 J, 550 W", "660 J, 330 W"], "correct": 0, "topic": "Circuits & Resistance"}, {"q": "A p.d of 24V is applied to a network of resistors 6 ohms and 12 ohms in parallel connection in series with 8 ohms resistance. Calculate the current in the 8 ohms.", "options": ["1 A", "2 A", "3 A", "4 A"], "correct": 0, "topic": "Circuits & Resistance"}, {"q": "Two charges exert a force of 5N on each other. Find the force if one of the charges is doubled while the distance remains unchanged.", "options": ["20 N", "10 N", "5 N", "15 N"], "correct": 1, "topic": "Electrostatics"}, {"q": "The study of magnetic fields that do not vary with time", "options": ["Magnetic force", "Magnetic flux", "Magnetostatic field", "Electromagnetic wave"], "correct": 2, "topic": "Magnetism"}, {"q": "Two capacitors 3µF and 6µF connected in series with a voltage of 400V. Calculate the energy stored in the 3µF capacitor.", "options": ["0.12 J", "0.24 J", "0.08 J", "0.36 J"], "correct": 0, "topic": "Capacitance"}, {"q": "The magnetic field is a?", "options": ["Partly vector and partly scalar quantity", "Scalar quantity", "Vector quantity", "Null quantity"], "correct": 2, "topic": "Magnetism"}, {"q": "The ratio of electric charge to the potential difference between or across the plates of the capacitor is called the?", "options": ["Energy storage", "Resistance of the capacitor", "Capacitance of the capacitor", "Potential difference"], "correct": 2, "topic": "Capacitance"}, {"q": "Calculate the length of the current-carrying wire with a current of 5.0 A and a force of 5 N placed in a magnetic field of 0.5 T if the field is perpendicular to the wire", "options": ["120 cm", "150 cm", "250 cm", "200 cm"], "correct": 3, "topic": "Magnetism"}, {"q": "Calculate the electrical energy and power used by an electric heater of 11 ohms when the voltage source is 220V for 2 seconds", "options": ["880 J, 440 W", "660 J, 330 W", "760 J, 380 W", "990 J, 495 W"], "correct": 0, "topic": "Circuits & Resistance"}, {"q": "Calculate the magnitude of the force acting on a current of 4A with length 100 cm and magnetic flux density of 5.0 T at an angle of 30°", "options": ["10 N", "5 N", "8.66 N", "6.0 N"], "correct": 2, "topic": "General Electricity & Magnetism"}, {"q": "Calculate electric flux if r = 0.5 m, Q = 2.0 microcoulomb, ε₀ = 8.85×10⁻¹²", "options": ["2.26 × 10⁵ Nm²/C", "4.52 × 10⁵ Nm²/C", "1.13 × 10⁵ Nm²/C", "3.01 × 10⁵ Nm²/C"], "correct": 0, "topic": "Electrostatics"}, {"q": "A p.d of 24V applied to the network of resistors 6 ohms and 12 ohms in parallel and connected in series with 8 ohms resistor. Calculate the current in the 8 ohms resistor.", "options": ["1.0 A", "1.5 A", "2.0 A", "2.5 A"], "correct": 1, "topic": "Circuits & Resistance"}, {"q": "A voltage supply of 400V is connected across capacitors of 3µF and 6µF. Calculate the energy stored in 3µF.", "options": ["0.12 J", "0.24 J", "0.08 J", "0.36 J"], "correct": 0, "topic": "Capacitance"}, {"q": "Which of the following expressions correctly defines the magnitude of force on a charge q due to another charge Q?", "options": ["F = KqQ/r²", "F = KqQ/r³", "F = KqQ/r", "F = KQ/r²"], "correct": 0, "topic": "Electrostatics"}, {"q": "Two resistors 16.0 ohms and 8.0 ohms are connected in series across a 12.0V battery. What is the voltage across each resistor?", "options": ["8V and 4V", "6V and 6V", "2V and 10V", "8V and 8V"], "correct": 0, "topic": "Circuits & Resistance"}, {"q": "A capacitor has 10nF and is charged to a potential difference of 5V. What charge is stored in the capacitor?", "options": ["50 μC", "5 × 10⁻⁸ C", "2 × 10⁻⁸ C", "5 × 10⁻⁹ C"], "correct": 1, "topic": "Capacitance"}, {"q": "What are the three factors that affect the capacitance in a capacitor?", "options": ["Voltage, resistance, temperature", "Plate area, distance between plates, dielectric constant", "Charge, potential difference, energy", "Length, width, thickness"], "correct": 1, "topic": "Capacitance"}, {"q": "Calculate the magnitude of force experienced by a current wire of length 100 cm and current 2 amperes in a field of 0.5 Tesla", "options": ["0.5 N", "1.0 N", "2.0 N", "5.0 N"], "correct": 1, "topic": "Magnetism"}, {"q": "Calculate the angle between the field and the current carrying wire of length 200 cm with current 5 amperes which experience a force of 5 Newtons in a magnetic field of 0.5 Tesla", "options": ["30°", "45°", "60°", "90°"], "correct": 3, "topic": "Magnetism"}, {"q": "Charge per unit time is called?", "options": ["Power", "Potential difference", "Current", "Resistance"], "correct": 2, "topic": "Electrostatics"}, {"q": "Calculate the potential difference in a capacitor with an electric field of 200 Newton per coulomb and a distance of separation of 0.02 m", "options": ["2V", "4V", "5V", "6V"], "correct": 1, "topic": "Capacitance"}, {"q": "Two unit charges are separated by 1 m in air. Calculate the force between the charges.", "options": ["9 × 10⁹ N", "9 N", "1 N", "0.5 N"], "correct": 0, "topic": "Electrostatics"}, {"q": "Calculate the capacitance of a capacitor with plates of area 80 cm² and dielectric paraffin wax which is 0.5 cm thick where the dielectric constant of paraffin wax is 2.", "options": ["2.83 × 10⁻¹² F", "2.83 × 10⁻¹¹ F", "1.42 × 10⁻¹² F", "1.42 × 10⁻¹¹ F"], "correct": 1, "topic": "Capacitance"}, {"q": "Which of the following includes the three factors that affect the capacitance of a capacitor?", "options": ["Plate area, distance between plates, dielectric material", "Resistance, temperature, frequency", "Voltage, time, resistance", "Length, current, field strength"], "correct": 0, "topic": "Capacitance"}, {"q": "If L = 10m, B = 0.05T and F = 2.5N, what is I?", "options": ["5 A", "10 A", "2 A", "1 A"], "correct": 0, "topic": "Magnetism"}, {"q": "Given F = ?, L = 100 cm, I = 2A, B = 0.5T, what is the force?", "options": ["0.5 N", "1.0 N", "2.0 N", "4.0 N"], "correct": 1, "topic": "Magnetism"}, {"q": "Factors affecting the capacitance of a capacitor", "options": ["Voltage, resistance, area", "Plate area, distance, dielectric", "Frequency, material, temperature", "Thickness, length, capacitance"], "correct": 1, "topic": "Capacitance"}, {"q": "16 and 8 ohms connected in series to a 12V battery, what is the voltage across each?", "options": ["4V and 8V", "6V and 6V", "8V and 4V", "10V and 2V"], "correct": 2, "topic": "Circuits & Resistance"}, {"q": "R = 11 ohms, V = 220V, t = 2s. Find electrical energy and power", "options": ["880 J, 440 W", "960 J, 480 W", "1100 J, 550 W", "660 J, 330 W"], "correct": 0, "topic": "Circuits & Resistance"}, {"q": "The effective capacitance of 3 and 6 microfarad connected in series", "options": ["2.0 μF", "1.0 μF", "4.5 μF", "9.0 μF"], "correct": 0, "topic": "Capacitance"}, {"q": "P.d across a 3 microfarad capacitor for 3 microfarad and 6 microfarad connected in series to a 400V battery", "options": ["100V", "200V", "300V", "267V"], "correct": 3, "topic": "Capacitance"}, {"q": "C = 0.05 microfarad, V = 200V, What is Q?", "options": ["1.0 × 10⁻⁵ C", "2.0 × 10⁻⁵ C", "1.0 × 10⁻⁶ C", "2.0 × 10⁻⁶ C"], "correct": 0, "topic": "Capacitance"}, {"q": "Resistors in series experience the same", "options": ["Voltage", "Power", "Current", "Resistance"], "correct": 2, "topic": "Circuits & Resistance"}, {"q": "Study of magnetic field that doesn't change with time", "options": ["Electromagnetic theory", "Electrostatics", "Magnetostatics", "Electrodynamics"], "correct": 2, "topic": "Magnetism"}, {"q": "ε₀ = 8.85 × 10⁻¹², Q = 2 × 10⁻⁶, r = 0.5. What is the electric flux?", "options": ["2.26 × 10⁵ Nm²/C", "1.13 × 10⁵ Nm²/C", "4.52 × 10⁵ Nm²/C", "3.01 × 10⁵ Nm²/C"], "correct": 0, "topic": "Electrostatics"}, {"q": "If the force between two charges is 5N, what will be the new force if one of the charges is doubled and the distance is constant?", "options": ["5N", "10N", "15N", "20N"], "correct": 1, "topic": "Electrostatics"}, {"q": "Q = 2 × 10⁻⁷, Q₂ = 3 × 10⁻⁶, F = 15N. Find r.", "options": ["0.3 m", "0.1 m", "0.5 m", "0.2 m"], "correct": 3, "topic": "General Electricity & Magnetism"}, {"q": "The direction of electric field is", "options": ["Towards a negative charge", "Away from a negative charge", "Away from a positive charge", "In circles around a charge"], "correct": 2, "topic": "Electrostatics"}, {"q": "Halving the distance will cause the electric potential energy to", "options": ["Double", "Remain the same", "Quadruple", "Halve"], "correct": 0, "topic": "Energy & Power"}, {"q": "Calculate the ohm per meter for a wire which has 4.70 × 10⁻⁵ Ω·m resistivity and a diameter of 0.4 mm.", "options": ["0.15 Ω/m", "0.375 Ω/m", "0.256 Ω/m", "0.124 Ω/m"], "correct": 1, "topic": "Circuits & Resistance"}, {"q": "What are the three factors affecting the capacitance of a capacitor?", "options": ["Plate area, dielectric material, and separation distance", "Temperature, resistance, and length", "Voltage, charge, and current", "Current, resistance, and time"], "correct": 0, "topic": "Capacitance"}, {"q": "Two resistors 16 ohms and 8 ohms are connected in series across a 12V battery. What is the voltage across each of the resistors?", "options": ["8V, 4V", "4V, 8V", "6V, 6V", "12V, 0V"], "correct": 0, "topic": "Circuits & Resistance"}, {"q": "The sum of all electrical potential differences around any closed circuit loop is zero is related to which law?", "options": ["Ohm’s law", "Faraday’s law", "Kirchhoff’s voltage law", "Coulomb’s law"], "correct": 2, "topic": "Circuits & Resistance"}, {"q": "The study of magnetic fields that do not vary with time is called:", "options": ["None of the above", "Magnetic flux", "Magnetic force", "Magnetostatic field"], "correct": 3, "topic": "Magnetism"}, {"q": "The ratio of charge to potential difference (voltage) between or across plates of capacitors is:", "options": ["Energy", "Capacitance of a capacitor", "Resistance of a resistor", "Potential difference"], "correct": 1, "topic": "Capacitance"}, {"q": "The voltage supply of 400V is connected across capacitors of 3μF and 6μF in series. Calculate the energy stored in the 3μF capacitor.", "options": ["0.12 J", "0.24 J", "0.48 J", "0.36 J"], "correct": 0, "topic": "Capacitance"}, {"q": "Calculate the resistance per meter length of constantan wire of diameter 0.4 mm. What length of constantan would be required to make a resistor of 1.5 Ω? Resistivity = 4.70 × 10⁻⁵ Ω·m.", "options": ["6.5 m", "4.0 m", "10.2 m", "12.6 m"], "correct": 1, "topic": "Circuits & Resistance"}, {"q": "What is the magnitude of force if the magnetic field is 0.5 T, length is 200 cm and current is 5 A?", "options": ["5 N", "2.5 N", "1 N", "0.5 N"], "correct": 0, "topic": "Magnetism"}, {"q": "Calculate the work done in the capacitor of capacitance 300 microfarad, and the p.d across the capacitor is 1000V.", "options": ["180 J", "160 J", "120 J", "None of the options"], "correct": 3, "topic": "Capacitance"}, {"q": "The electric field is given by:", "options": ["E = kq / r²", "E = kQq / r", "E = kq / r³", "E = k / q²"], "correct": 0, "topic": "Electrostatics"}, {"q": "Calculate the electric energy and the power dissipated if R = 11Ω, V = 220V, and the time taken is 2 seconds.", "options": ["8.5 kW, 4.4 kJ", "8.8 kJ, 4.2 kW", "8.8 kJ, 4.4 kW", "4.4 kJ, 8.8 kW"], "correct": 2, "topic": "Energy & Power"}, {"q": "The quantity of an electric charge per unit time is:", "options": ["Electric voltage", "Electric current", "Electric field", "Electric flux"], "correct": 1, "topic": "Electrostatics"}, {"q": "What magnetic law is concerned with a constant electric current?", "options": ["Biot-Savart law", "Kirchhoff’s law", "Ampere’s law", "Coulomb’s law"], "correct": 2, "topic": "General Electricity & Magnetism"}, {"q": "Calculate the force of magnetic field given that B = 0.5 T, I = 5 A, L = 200 cm and the direction is perpendicular.", "options": ["5 N", "2.5 N", "1.5 N", "10 N"], "correct": 0, "topic": "Magnetism"}, {"q": "Calculate resistance per meter length given diameter to be 0.4 mm and resistivity equals 4.70 × 10⁻⁵ Ω·m.", "options": ["0.375 Ω/m", "0.25 Ω/m", "0.50 Ω/m", "0.10 Ω/m"], "correct": 0, "topic": "Circuits & Resistance"}, {"q": "What’s the equivalent capacitance of 3 μF and 6 μF connected in series?", "options": ["2 μF", "18 μF", "None of the options", "9 μF"], "correct": 0, "topic": "Capacitance"}, {"q": "The direction of an electric field at a point near the negative charge:", "options": ["Away from the charge", "Perpendicular to the charge", "Towards the charge", "Constant"], "correct": 2, "topic": "Electrostatics"}, {"q": "The direction of an electric field at a point near the positive charge:", "options": ["Away from the charge", "Perpendicular to the charge", "Towards the charge", "Constant"], "correct": 0, "topic": "Electrostatics"}, {"q": "Two charges, +3 μC and -3 μC separated by 0.2 m. What is their electric potential energy?", "options": ["-0.81 J", "-0.405 J", "-0.504 J", "-1.080 J"], "correct": 1, "topic": "Energy & Power"}, {"q": "The force of a magnetic field is 2.5 N, magnetic field strength is 0.5 T and the length is 100 cm. Find the current.", "options": ["5 A", "2.5 A", "10 A", "1.5 A"], "correct": 0, "topic": "Magnetism"}, {"q": "Find the angle if the force of a magnetic field is 5 N, magnetic field strength is 0.5 T and the current is 5 A and the length is 200 cm.", "options": ["90", "0", "180", "270"], "correct": 0, "topic": "Magnetism"}, {"q": "Two resistors connected in series, 16Ω and 8Ω, have a voltage of 12V. Calculate the voltage in each resistor.", "options": ["8V, 4V", "8V, 9V", "4V, 7V", "0V, 2V"], "correct": 0, "topic": "Circuits & Resistance"}, {"q": "The term used to describe two charges equal in magnitude but opposite in sign is:", "options": ["Dipole", "Dipole moment", "Electric field", "Coulomb pair"], "correct": 0, "topic": "Electrostatics"}, {"q": "If the distance between two charges is doubled, how does the electrostatic force between them change?", "options": ["It doubles", "It reduces by half", "It becomes one-fourth", "It stays the same"], "correct": 2, "topic": "Electrostatics"}, {"q": "Calculate the electrical energy and power used by the electric heater of 11Ω when voltage is 220V for 2 seconds.", "options": ["8.8 kJ, 4.4 kW", "4.4 kJ, 8.8 kW", "5.5 kJ, 2.2 kW", "6.6 kJ, 3.3 kW"], "correct": 0, "topic": "Energy & Power"}, {"q": "What law explains the magnetic field by constant electric current?", "options": ["Ampere’s law", "Gauss’s law", "Biot-Savart law", "Lenz’s law"], "correct": 0, "topic": "Magnetism"}, {"q": "Find the angle θ if the magnetic force is known and the following values are given: Length of conductor L = 100 cm, current I = 24 mA, magnetic field B = 0.5 T.", "options": ["30°", "60°", "90°", "45°"], "correct": 2, "topic": "Magnetism"}, {"q": "If L = 200 cm, I = 5 mA, magnetic field B = 0.5 T, and magnetic force F = 5 N, find the angle θ.", "options": ["60°", "30°", "90°", "45°"], "correct": 2, "topic": "Magnetism"}, {"q": "Which of the following are three factors that affect the magnetic force on a current-carrying conductor in a magnetic field?", "options": ["Thickness, magnetic field strength, area", "Material, length of conductor, current", "Temperature, magnetic flux, area", "Length, current, magnetic field strength"], "correct": 3, "topic": "Magnetism"}, {"q": "Calculate resistance per metre (Ω/m) if diameter d = 0.4 mm and resistivity ρ = 41.7 × 10⁻⁵ Ωm.", "options": ["73.4", "37.4", "43.0", "73.4"], "correct": 1, "topic": "Circuits & Resistance"}, {"q": "In a series combination, resistors of 16 Ω, 5 Ω, 8 Ω, and one unknown are connected to a 12 V battery. What is the value of the missing resistor if the potential difference across it is required?", "options": ["9 Ω", "6 Ω", "9 Ω", "10 Ω"], "correct": 1, "topic": "Circuits & Resistance"}, {"q": "A parallel-plate capacitor has a plate separation d = 0.5 cm, area A = 80 cm², dielectric constant k = 2.0, and electric field E = 5.55 × 10² N/C. Find the electric potential difference.", "options": ["9 V", "12 V", "6 V", "3 V"], "correct": 3, "topic": "Capacitance"}, {"q": "If the capacitance C = 0.05 µF and potential difference V = 200 V, find the area A of the plates.", "options": ["30 pF", "38 pF", "20 pF", "28 pF"], "correct": 2, "topic": "Capacitance"}, {"q": "What is defined as charge per unit time?", "options": ["15", "25", "10", "20"], "correct": 3, "topic": "Electrostatics"}, {"q": "What is the term for charge per unit time that does not vary with time?", "options": ["Power", "Current", "Force", "Proton"], "correct": 1, "topic": "Electrostatics"}, {"q": "What is the study of magnetic fields that do not change with time called?", "options": ["Magnetostatics", "Electromagnetism", "Magnetic flux", "Induction"], "correct": 0, "topic": "Magnetism"}, {"q": "Two charges q₁ = 3 µC and q₂ = 2 µC are separated by a distance of r = 0.5 m. Find the electrostatic force between them.", "options": ["0.216 N", "0.542 N", "1.080 N", "0.831 N"], "correct": 0, "topic": "Electrostatics"}, {"q": "If potential difference = 120 V and distance d = 3.0 m, find the electric field intensity E.", "options": ["50 N/C", "45 N/C", "40 N/C", "55 N/C"], "correct": 2, "topic": "Electrostatics"}, {"q": "If the electrostatic force F = 5 N and q₁ is doubled, while q₂ = 6 µC, what is the new force between the charges?", "options": ["2.5 N", "20 N", "5 N", "10 N"], "correct": 3, "topic": "Electrostatics"}, {"q": "If V = 400 V and C = 3 µF, find the charge q.", "options": ["2.5 C", "20 C", "5 C", "10 C"], "correct": 2, "topic": "Electrostatics"}, {"q": "What is the direction of the electric field experienced by a negative charge q₁?", "options": ["Toward the positive plate", "Along the field lines", "Opposite to the field direction", "Away from the negative plate"], "correct": 2, "topic": "Electrostatics"}];
+const MTH102_BANK = [{"q": "Evaluate lim(x→4) (x−4)/(x²−x−12)", "options": ["1/4", "1/7", "1/3", "7"], "correct": 1, "topic": "Limits"}, {"q": "If g(x) = x²−4x+2, find g(x+1)", "options": ["x²+2x−1", "x²−2x−1", "x²−4x+1", "x²−2x+1"], "correct": 1, "topic": "Functions"}, {"q": "If g(x) = 3ˣ, find g(x+4)/g(x+2)", "options": ["3", "6", "9", "81"], "correct": 2, "topic": "Functions"}, {"q": "Find the stationary points of y = x³−2x²+x+7", "options": ["x = 1 or 2", "x = 1/3 or 1", "x = −1/3 or −1", "x = 0 or 1"], "correct": 1, "topic": "Calculus"}, {"q": "Evaluate ∫(5/x) dx", "options": ["5x + C", "5 ln x + C", "ln(5x) + C", "(5/2)x² + C"], "correct": 1, "topic": "Integration"}, {"q": "Differentiate y = sin(1+x⁵)", "options": ["cos(1+x⁵)", "5x⁴ sin(1+x⁵)", "5x⁴ cos(1+x⁵)", "x⁴ cos(1+x⁵)"], "correct": 2, "topic": "Differentiation"}, {"q": "Evaluate lim(x→0) (7ˣ−3)/(5ˣ+3)", "options": ["1/2", "−1/2", "−2", "4/3"], "correct": 1, "topic": "Limits"}, {"q": "Evaluate ∫(2/x) dx", "options": ["2x + C", "2 ln x + C", "ln(2x) + C", "x² + C"], "correct": 1, "topic": "Integration"}, {"q": "Differentiate y = 3x³", "options": ["3x²", "9x²", "9x³", "x²"], "correct": 1, "topic": "Differentiation"}, {"q": "Evaluate ∫ x/√x dx", "options": ["(3/2)x^(1/2) + C", "(2/3)x^(3/2) + C", "(1/2)x^(3/2) + C", "x^(3/2) + C"], "correct": 1, "topic": "Integration"}, {"q": "Evaluate ∫(3/4)x^(1/2) dx", "options": ["(3/4)x^(3/2) + C", "(1/2)x^(3/2) + C", "(3/2)x^(3/2) + C", "(1/4)x^(3/2) + C"], "correct": 1, "topic": "Integration"}, {"q": "Differentiate y = ln(2x+1)", "options": ["1/(2x+1)", "2/(2x+1)", "2/(x+1)", "1/(x+1)"], "correct": 1, "topic": "Differentiation"}, {"q": "Evaluate ∫(1/x)(2x²−1) dx", "options": ["2x² − ln x + C", "x² − ln x + C", "x² + ln x + C", "2x − ln x + C"], "correct": 1, "topic": "Integration"}, {"q": "If F(x) = (3x³−1)/(2x²+1), find F(5)/F(3)", "options": ["1.0", "0.57", "1.74", "4.68"], "correct": 2, "topic": "Functions"}, {"q": "Evaluate ∫e^(−4x) dx", "options": ["−4e^(−4x) + C", "e^(−4x) + C", "−(1/4)e^(−4x) + C", "(1/4)e^(−4x) + C"], "correct": 2, "topic": "Integration"}, {"q": "Evaluate ∫(eᵗ+1)² dt", "options": ["(1/2)e^(2t) + eᵗ + C", "(1/2)e^(2t) + 2eᵗ + t + C", "e^(2t) + 2eᵗ + C", "e^(2t) + t + C"], "correct": 1, "topic": "Integration"}, {"q": "Evaluate ∫(1/x)(1+x)² dx", "options": ["ln x + x² + C", "ln x + 2x + x²/2 + C", "ln x + 2x + x² + C", "2 ln x + x² + C"], "correct": 1, "topic": "Integration"}, {"q": "Differentiate y = x² cos x", "options": ["−x² sin x", "2x cos x", "2x cos x − x² sin x", "2x cos x + x² sin x"], "correct": 2, "topic": "Differentiation"}, {"q": "Differentiate y = ln(sin x)", "options": ["tan x", "cot x", "−cot x", "1/sin x"], "correct": 1, "topic": "Differentiation"}, {"q": "Find the domain of √(4−x²)", "options": ["(−∞, 2]", "[−2, 2]", "[0, 2]", "(−2, 2)"], "correct": 1, "topic": "Functions & Domain"}, {"q": "If f(x) = 7x²+6, find f(−2)", "options": ["22", "28", "34", "−22"], "correct": 2, "topic": "Functions"}, {"q": "Evaluate lim(x→6) (x+1)/(x²−x−2)", "options": ["1/2", "7/28", "1/4", "7/4"], "correct": 2, "topic": "Limits"}, {"q": "Evaluate lim(z→∞) 2z/(z−6)", "options": ["0", "2", "∞", "−2"], "correct": 1, "topic": "Limits"}, {"q": "Evaluate ∫(√x + 1/x) dx", "options": ["(2/3)x^(3/2) + x + C", "(2/3)x^(3/2) + ln x + C", "(1/2)x^(3/2) + ln x + C", "x^(3/2) + ln x + C"], "correct": 1, "topic": "Integration"}, {"q": "Differentiate y = ln(√(x−1))", "options": ["1/(x−1)", "1/(2(x−1))", "1/(2√(x−1))", "2/(x−1)"], "correct": 1, "topic": "Differentiation"}, {"q": "Differentiate y = sin x − eˣ cos x", "options": ["cos x − eˣ sin x", "cos x + eˣ sin x − eˣ cos x", "cos x − eˣ cos x", "−cos x + eˣ sin x"], "correct": 1, "topic": "Differentiation"}, {"q": "Differentiate y = (1+x²) cos x", "options": ["−(1+x²) sin x", "2x cos x − (1+x²) sin x", "2x cos x + (1+x²) sin x", "−2x sin x + cos x"], "correct": 1, "topic": "Differentiation"}, {"q": "Evaluate lim(x→5) (x²−25)/(x−5)", "options": ["0", "5", "10", "25"], "correct": 2, "topic": "Limits"}];
+const STA111_BANK = [{"q": "______ is the collection, organization, summarization, and presentation of data", "options": ["Descriptive statistics", "Quantitative statistics", "Inferential statistics", "Qualitative status"], "correct": 0, "topic": "General Statistics"}, {"q": "The most appropriate graphical representation for ordinal scale (categorical scale) is ________", "options": ["Ogive", "Pie chart", "Frequency polygon", "Histogram"], "correct": 1, "topic": "Graphical Representation"}, {"q": "______ variables classify data into categories that can be ranked", "options": ["Ordinal", "Interval", "Nominal", "Ratio"], "correct": 0, "topic": "Frequency Distributions"}, {"q": "All subjects possessing a common characteristic that is being studied is called _____", "options": ["Sample", "Population", "Census", "Statistics"], "correct": 1, "topic": "General Statistics"}, {"q": "The data below represents the scores of nine students in a test: 45, 32, 37, 46, 39, 36, 41, 48, 38. Find the geometric mean", "options": ["20.01", "35.16", "41.25", "45.63"], "correct": 2, "topic": "Measures of Central Tendency"}, {"q": "Calculate the harmonic mean of the following 8 observations: 6, 7, 9, 3, 8, 5, 4, 2", "options": ["4.5", "5.3", "6.1", "7.2"], "correct": 0, "topic": "Measures of Central Tendency"}, {"q": "The following are examples of sampling except", "options": ["Systematic", "Random", "Stepwise", "Cluster"], "correct": 2, "topic": "Sampling & Data Collection"}, {"q": "An example of an ordinal scale is ______", "options": ["John", "Weight", "Colour", "Levels in the university"], "correct": 3, "topic": "Scales & Variable Types"}, {"q": "______ scale classifies data into all-inclusive, mutually exclusive categories in which no order or ranking can be imposed on the data", "options": ["Ratio", "Nominal", "Ordinal", "Interval"], "correct": 1, "topic": "Frequency Distributions"}, {"q": "Methods of sampling include the following except", "options": ["Stepwise", "Sampling", "Cluster", "Systematic"], "correct": 0, "topic": "Sampling & Data Collection"}, {"q": "The following are measures of central tendency except", "options": ["Mode", "Range", "Harmonic mean", "Geometric mean"], "correct": 1, "topic": "Measures of Central Tendency"}, {"q": "Data that cannot be ranked is known as ______", "options": ["Nominal", "Ordinal", "Interval", "Frequency"], "correct": 0, "topic": "General Statistics"}, {"q": "The middle of a class is ______", "options": ["Class representative", "Class width", "Class length", "Range"], "correct": 0, "topic": "Frequency Distributions"}, {"q": "Which of the following is not part of an interval scale?", "options": ["Height", "Temperature", "Intelligent quotient", "Test scores"], "correct": 0, "topic": "Scales & Variable Types"}, {"q": "8, 9, 10, 12, 4, 8, 2. Find the absolute mean deviation", "options": ["4.62", "3.0", "2.61", "3.87"], "correct": 2, "topic": "Measures of Central Tendency"}, {"q": "The mean of random 15 numbers is 6 and the mean of random 24 numbers is 24. Find the mean of the 39 combined numbers", "options": ["14.67", "19.21", "20.08", "22.15"], "correct": 1, "topic": "Measures of Central Tendency"}, {"q": "Types of bar charts except", "options": ["Multiple", "Component", "Random", "Simple"], "correct": 2, "topic": "Graphical Representation"}, {"q": "Another name for Ogive is ______", "options": ["Cumulative frequency curve", "Histogram", "Box plot", "Frequency polygon"], "correct": 0, "topic": "Graphical Representation"}, {"q": "Example of nominal scale", "options": ["Colour", "University grade", "Levels in university", "Temperature"], "correct": 0, "topic": "Scales & Variable Types"}, {"q": "A surveyor is asked to take a population survey of 5000 people. 30% of them are unemployed, 60% are retired. Which survey method is not suitable?", "options": ["Giving out questionnaires", "Census counting", "Going back to respondents", "Going back to non-respondents"], "correct": 2, "topic": "Sampling & Data Collection"}, {"q": "Which of the following is not an ordinal scale?", "options": ["Grades in university", "Colour", "Levels in university", "Matriculation number"], "correct": 3, "topic": "Scales & Variable Types"}, {"q": "Which is the formula for geometric mean?", "options": ["GM = √(x₁ × x₂ × ... × xn)", "GM = Σx / n", "GM = 1/n (Σ 1/x)", "GM = Σ log(x)"], "correct": 0, "topic": "Measures of Central Tendency"}, {"q": "A random variable which is more than the rest of the distribution is ______", "options": ["Mean", "Median", "Mode", "Outlier"], "correct": 3, "topic": "Scales & Variable Types"}, {"q": "Which of these is an ordinal scale?", "options": ["Levels in the university", "Colour", "Weight", "John"], "correct": 0, "topic": "Scales & Variable Types"}, {"q": "Find the absolute mean deviation for the set: 8, 9, 10, 12, 4, 8, 2", "options": ["3.87", "3.0", "4.62", "2.61"], "correct": 3, "topic": "Measures of Central Tendency"}, {"q": "The data below represents the score of nine students in a test: 45, 32, 37, 46, 39, 36, 41, 48, 38. Find the geometric mean.", "options": ["19.22", "22.03", "39.68", "43.28"], "correct": 2, "topic": "Measures of Central Tendency"}, {"q": "The arithmetic mean of 15 randomly selected numbers is 6, and that of 24 numbers is 12. Find the mean of the combined 39 numbers.", "options": ["13.23", "90.45", "9.69", "29.63"], "correct": 2, "topic": "Measures of Central Tendency"}, {"q": "______ is the type of categorical data that represents variables with no order.", "options": ["Nominal", "Ordinal", "Interval", "Ratio"], "correct": 0, "topic": "Scales & Variable Types"}, {"q": "The most appropriate measure of location is ______.", "options": ["Median", "Mean", "Geometric", "Mode"], "correct": 1, "topic": "General Statistics"}, {"q": "Another name for Ogives is ______.", "options": ["Cumulative frequency curve", "Line graph", "Histogram", "Bar chart"], "correct": 0, "topic": "Graphical Representation"}, {"q": "Data collected by an investigator is called ______.", "options": ["Primary data", "Secondary data", "Qualitative data", "Quantitative data"], "correct": 0, "topic": "Sampling & Data Collection"}, {"q": "Calculate the relative frequency of blood group O if the data is: A = 9, B = 7, O = 3, AB = 6.", "options": ["0.1", "0.2", "0.3", "0.4"], "correct": 0, "topic": "Frequency Distributions"}, {"q": "What is another name for a multiple bar?", "options": ["Stacked", "Clustered", "Component", "Simple"], "correct": 1, "topic": "General Statistics"}, {"q": "______ is the difference between the lower limit and the upper limit.", "options": ["Range", "Class mark", "Class width", "Variance"], "correct": 0, "topic": "General Statistics"}, {"q": "The following are measures of central tendency except ______.", "options": ["Harmonic mean", "Geometric mean", "Range", "Mode"], "correct": 2, "topic": "Measures of Central Tendency"}, {"q": "The data that is being collected for the first time and hasn't been used by any investigator for research purposes is termed ______.", "options": ["Primary data", "Secondary data", "Qualitative data", "Quantitative data"], "correct": 0, "topic": "General Statistics"}, {"q": "---- is a characteristic or measure obtained from a sample.", "options": ["Census", "Sampler", "Statistics", "Parameter"], "correct": 2, "topic": "Sampling & Data Collection"}, {"q": "Adding the upper limit and lower limit and dividing by two gives ______.", "options": ["Midpoint", "Midrange", "Class length", "Class range"], "correct": 0, "topic": "General Statistics"}, {"q": "What is an example of ordinal data?", "options": ["University grade", "Level in university", "Temperature", "Height"], "correct": 0, "topic": "Scales & Variable Types"}, {"q": "What is an example of nominal data?", "options": ["Levels in university", "Grades in university", "Gender", "Color"], "correct": 2, "topic": "Scales & Variable Types"}, {"q": "What is the appropriate measure of central tendency?", "options": ["Mean", "Median", "Mode", "Variance"], "correct": 0, "topic": "Measures of Central Tendency"}, {"q": "The difference between the lower class limit and the upper class limit is ______.", "options": ["Midpoint", "Class size", "Variance", "Range"], "correct": 1, "topic": "Frequency Distributions"}, {"q": "What is the best graphical representation for nominal (categorical frequency distribution)?", "options": ["Frequency polygon", "Ogive", "Pie chart", "Histogram"], "correct": 2, "topic": "Graphical Representation"}, {"q": "A frequency distribution with nominal and ordinal data is called ______.", "options": ["Categorical frequency distribution", "Relative frequency distribution", "Grouped frequency distribution", "Continuous frequency distribution"], "correct": 0, "topic": "Frequency Distributions"}, {"q": "A characteristic or measure obtained from a population is called a parameter.", "options": ["Sample", "Statistic", "Parameter", "Census"], "correct": 2, "topic": "Statistical Concepts"}, {"q": "Types of statistics:", "options": ["Descriptive and Inferential", "Quantitative and Qualitative", "Primary and Secondary", "Population and Sample"], "correct": 0, "topic": "Statistical Concepts"}, {"q": "The difference between the maximum and minimum values in a dataset is called:", "options": ["Median", "Mode", "Range", "Mean"], "correct": 2, "topic": "General Statistics"}, {"q": "Which of the following data types is numeric?", "options": ["Qualitative", "Categorical", "Quantitative", "Nominal"], "correct": 2, "topic": "General Statistics"}, {"q": "A random variable that takes a non-countably infinite number of values is ______.", "options": ["Discrete", "Continuous", "Nominal", "Ordinal"], "correct": 1, "topic": "Scales & Variable Types"}, {"q": "Variables that assume numerical values are ______.", "options": ["Quantitative", "Qualitative", "Ordinal", "Categorical"], "correct": 0, "topic": "Scales & Variable Types"}, {"q": "Adding upper and lower class limits and dividing by 2 is ______.", "options": ["Class mark", "Midpoint", "Class size", "Range"], "correct": 0, "topic": "Frequency Distributions"}, {"q": "Another name for class width is ______.", "options": ["Class size", "Class range", "Class midpoint", "Class length"], "correct": 0, "topic": "Frequency Distributions"}, {"q": "______ is a measure obtained from a sample.", "options": ["Census", "Statistic", "Parameter", "Mean"], "correct": 1, "topic": "Sampling & Data Collection"}, {"q": "Multiple bar chart is also known as ______.", "options": ["Stacked", "Clustered", "Simple", "Grouped"], "correct": 1, "topic": "Graphical Representation"}, {"q": "______ is a set of information about people, things, etc.", "options": ["Data", "Statistics", "Variables", "Observations"], "correct": 0, "topic": "General Statistics"}, {"q": "The following are sources of data except:", "options": ["Census", "Direct questionnaire", "Post questionnaire", "Planning data"], "correct": 3, "topic": "General Statistics"}, {"q": "The following must be in a group except:", "options": ["Frequency", "Relative frequency", "Tally", "Class interval"], "correct": 1, "topic": "General Statistics"}, {"q": "Which one of these is suited for graphical representation of categorical data?", "options": ["Line graph", "Histogram", "Bar chart", "Frequency polygon"], "correct": 2, "topic": "Graphical Representation"}, {"q": "______ is the data collected by a researcher.", "options": ["Primary data", "Secondary data", "Census", "Tertiary data"], "correct": 0, "topic": "Sampling & Data Collection"}, {"q": "Compute the mean of the weight of 10 randomly selected children at a daycare center: 68, 63, 42, 27, 30, 36, 28, 32, 79, 27.", "options": ["43.2", "22.8", "22.2", "44.8"], "correct": 0, "topic": "Measures of Central Tendency"}, {"q": "The following are examples of ordinal scale except:", "options": ["Matriculation number", "Levels in the university", "Grades in the university", "Opinion poll"], "correct": 0, "topic": "Scales & Variable Types"}, {"q": "The arithmetic mean of 17 randomly selected numbers is 8, and that of 26 numbers is 13. Find the mean of the combined 43 numbers.", "options": ["12.32", "4.74", "11.30", "14.74", "11.02"], "correct": 4, "topic": "Measures of Central Tendency"}, {"q": "A frequency distribution of numerical data in which the raw data is not grouped is called ______.", "options": ["Cumulative frequency distribution", "Grouped frequency distribution", "Raw frequency distribution", "Ungrouped frequency distribution"], "correct": 3, "topic": "Frequency Distributions"}, {"q": "The difference between the upper and lower boundaries of any class is called", "options": ["Interquartile range", "Class size", "Midpoint", "Class rep"], "correct": 1, "topic": "Frequency Distributions"}, {"q": "Which of the following is not part of a measure of central tendency?", "options": ["Geometric mean", "Arithmetic mean", "Range", "Mode"], "correct": 2, "topic": "Measures of Central Tendency"}, {"q": "What type of data is non-numerical?", "options": ["Continuous", "Qualitative", "Discrete", "Ordinal"], "correct": 1, "topic": "General Statistics"}, {"q": "Which is not a method of sampling?", "options": ["Stem-wise", "Cluster", "Random", "Systematic"], "correct": 0, "topic": "Sampling & Data Collection"}, {"q": "The following are qualitative variables except:", "options": ["Age", "Blood group", "Colour", "Marital status"], "correct": 0, "topic": "Scales & Variable Types"}, {"q": "The difference between the upper and lower class boundary gives what?", "options": ["Class size", "Range", "Interval", "Class mark"], "correct": 0, "topic": "Frequency Distributions"}, {"q": "The sum of the upper and lower class intervals divided by two gives what?", "options": ["Midpoint", "Range", "Class mark", "Class size"], "correct": 2, "topic": "Frequency Distributions"}, {"q": "All subjects with common similarities being studied is called:", "options": ["Population", "Census", "Sample", "Parameter"], "correct": 0, "topic": "General Statistics"}, {"q": "The most appropriate measure of central tendency for ordinal data is:", "options": ["Mean", "Mode", "Median", "Geometric mean"], "correct": 2, "topic": "Measures of Central Tendency"}, {"q": "Which of these isn’t a measure of central tendency?", "options": ["Mean", "Geometric mean", "Range", "Mode"], "correct": 2, "topic": "Measures of Central Tendency"}, {"q": "Which of these is the most suitable for representing ordinal data?", "options": ["Histogram", "Bar chart", "Ogive", "Pie chart"], "correct": 1, "topic": "Scales & Variable Types"}, {"q": "The variable that doesn't have to deal with numbers is:", "options": ["Qualitative variable", "Quantitative variable", "Continuous variable", "Discrete variable"], "correct": 0, "topic": "Scales & Variable Types"}, {"q": "The following are types of sampling except:", "options": ["Random", "Cluster", "Step-wise", "Systematic"], "correct": 2, "topic": "Sampling & Data Collection"}, {"q": "The following are sources of data except:", "options": ["Census", "Direct through questionnaire", "Questionnaire through mail", "Planning data"], "correct": 3, "topic": "General Statistics"}, {"q": "Which of the following is not an ordinal scale?", "options": ["Grades in university", "Opinion poll", "Levels in university", "Matriculation number"], "correct": 3, "topic": "Scales & Variable Types"}, {"q": "Another name for an ogive is:", "options": ["Bar chart", "Relative cumulative frequency", "Histogram", "Frequency polygon"], "correct": 1, "topic": "Graphical Representation"}, {"q": "What kind of data is represented by categories?", "options": ["Nominal and Ordinal", "Ratio", "Interval", "Not listed"], "correct": 0, "topic": "General Statistics"}, {"q": "The meaning of frequency polygon is:", "options": ["A graph connecting midpoints of a class", "A representation of class boundaries", "A cumulative frequency chart", "A type of histogram"], "correct": 0, "topic": "Measures of Central Tendency"}, {"q": "A multiple bar chart can also be called:", "options": ["Clustered", "Multiple", "Stacked", "Not listed"], "correct": 0, "topic": "Graphical Representation"}, {"q": "One of these is not a source of data:", "options": ["Census", "Questionnaire", "Observation", "Not listed"], "correct": 3, "topic": "Sampling & Data Collection"}, {"q": "The average of upper or lower limit of class interval is", "options": ["Midpoint", "Range", "Class mark", "Frequency"], "correct": 2, "topic": "Frequency Distributions"}, {"q": "The midpoint of a class interval is", "options": ["Class mark", "Range", "Frequency", "Cumulative frequency"], "correct": 0, "topic": "Frequency Distributions"}, {"q": "They drew a frequency polygon diagram and asked me which diagram it is", "options": ["Frequency Polygon", "Histogram", "Bar Chart", "Component Bar Chart"], "correct": 0, "topic": "Graphical Representation"}, {"q": "A population can be represented as", "options": ["Statistics", "Parameter", "Inference", "Hypothesis"], "correct": 1, "topic": "Statistical Concepts"}, {"q": "______ is a real-valued function whose values can be taken within a defined range.", "options": ["Random Variable", "Parameter", "Statistic", "Range"], "correct": 0, "topic": "Measures of Dispersion"}, {"q": "______ is a characteristic or measure obtained from a population.", "options": ["Parameter", "Statistic", "Variable", "Mean"], "correct": 0, "topic": "Statistical Concepts"}, {"q": "The difference between the maximum value and minimum value in a distribution is ______.", "options": ["Range", "Mean Deviation", "Variance", "Standard Deviation"], "correct": 0, "topic": "General Statistics"}, {"q": "The most appropriate measure of central tendency for nominal scale is", "options": ["Mean", "Mode", "Median", "Standard deviation"], "correct": 1, "topic": "Measures of Central Tendency"}, {"q": "These are examples of ordinal scale except", "options": ["University grades", "Matric number", "Levels in universities", "Opinion poll"], "correct": 1, "topic": "Scales & Variable Types"}, {"q": "The following must be in a grouped frequency distribution except", "options": ["Frequency", "Tally", "Class intervals", "Relative frequency"], "correct": 3, "topic": "Frequency Distributions"}, {"q": "________ is the difference between the lower limits and upper limits.", "options": ["Range", "Class size", "Midpoint", "Interval"], "correct": 0, "topic": "General Statistics"}, {"q": "The following are examples of nominal scale except", "options": ["Colour", "Gender", "Score in STA 131", "Number plate"], "correct": 2, "topic": "Scales & Variable Types"}, {"q": "A frequency distribution where several numbers are grouped into one class is ________", "options": ["Cumulative distribution", "Grouped distribution", "Range distribution", "Class limit distribution"], "correct": 1, "topic": "Frequency Distributions"}, {"q": "Multiple bar chart is also known as ________", "options": ["Stacked bar chart", "Comparative bar chart", "Clustered bar chart", "Grouped bar chart"], "correct": 2, "topic": "Graphical Representation"}, {"q": "The data below represents the scores of nine students in a test: 45, 32, 37, 46, 39, 36, 41, 48, 36 Find the geometric mean.", "options": ["38.94", "39.68", "41.27", "43.05"], "correct": 1, "topic": "Measures of Central Tendency"}, {"q": "Arithmetic mean of 17 students is 8 and the arithmetic mean of 24 other students is 12. Find the mean if the combined students is 20.", "options": ["10.67", "9.72", "10.00", "11.20"], "correct": 0, "topic": "Measures of Central Tendency"}, {"q": "Given the following data on shoe size of some students: 4, 8, 9, 7, 6, 7, 8, 5, 5, 7 Obtain the median.", "options": ["6.5", "7", "7.5", "8"], "correct": 1, "topic": "Measures of Central Tendency"}, {"q": "The following are means of dispersion except", "options": ["Geometric mean", "Range", "Variance", "Standard deviation"], "correct": 0, "topic": "Measures of Central Tendency"}, {"q": "The following are examples of quantitative variables except", "options": ["Gender", "Temperature", "Height", "Weight"], "correct": 0, "topic": "Scales & Variable Types"}, {"q": "______ is the summarization, organization, and presentation of data.", "options": ["Descriptive statistics", "Qualitative statistics", "Quantitative statistics", "Inference statistics"], "correct": 0, "topic": "General Statistics"}, {"q": "______ is a collection that contains a well-defined range of data.", "options": ["Set", "Variance", "Statistics", "Numbers"], "correct": 0, "topic": "Measures of Dispersion"}, {"q": "You are asked to do a survey on 5000 people dwelling in a village about their political aspirations. If there is a national university close to the village, retired and elderly dwelling there too, which is the best method for you to use to collect the information?", "options": ["Through personal interviews", "Emailing the villagers", "Conducting an experiment", "Visiting non-respondents"], "correct": 0, "topic": "Sampling & Data Collection"}, {"q": "The difference between the upper class limit and lower class limit in a set of data gives the ______.", "options": ["Midpoint", "Class size", "Range", "Interval"], "correct": 1, "topic": "Frequency Distributions"}, {"q": "The total number of times a value appears or occurs is known as ______.", "options": ["Midpoint", "Frequency", "Class boundary", "Interval"], "correct": 1, "topic": "General Statistics"}, {"q": "Which of the following is not an example of the ordinal system?", "options": ["Grade system in the university", "Matriculation number", "Opinion poll", "Levels in an organization"], "correct": 1, "topic": "Scales & Variable Types"}, {"q": "If the following set of values are given: 45, 32, 37, 46, 39, 36, 41, 48, 38 Find the geometric mean.", "options": ["19.27", "43.28", "39.68", "22.03"], "correct": 2, "topic": "Measures of Central Tendency"}, {"q": "Find the median if:", "options": ["3", "5", "6", "2", "4"], "correct": 1, "topic": "Measures of Central Tendency"}, {"q": "Identify the outliers in this data set: 2, 12, 13, 14, 15, 16, 17, 18, 22", "options": ["14", "12", "2", "22"], "correct": 2, "topic": "Statistical Concepts"}, {"q": "Find the relative frequency for blood group B.", "options": ["0.28", "17", "16", "0.36"], "correct": 0, "topic": "Frequency Distributions"}, {"q": "Find the cumulative frequency for blood group AB.", "options": ["0.24", "19", "25", "9"], "correct": 2, "topic": "Frequency Distributions"}, {"q": "8 bulbs were tested to determine their lifetime in hours. Obtain the median class.", "options": ["63.5–74.5", "74.5–85.5", "85.5–96.5", "96.5–107.5"], "correct": 1, "topic": "Measures of Central Tendency"}, {"q": "A man kept count of the number of GSM texts he received over a total of 100 days. Find the median number of texts received per day.", "options": ["0", "1", "2", "3"], "correct": 1, "topic": "Measures of Central Tendency"}];
+
+const COURSES = [
+  { id: "PHY102", code: "PHY 102", title: "Electricity & Magnetism", glyph: "Φ", bank: PHY102_BANK, blurb: "Charges, fields, circuits, and magnetism." },
+  { id: "MTH102", code: "MTH 102", title: "Calculus II", glyph: "∫", bank: MTH102_BANK, blurb: "Limits, derivatives, and integrals." },
+  { id: "STA111", code: "STA 111", title: "Descriptive Statistics", glyph: "σ", bank: STA111_BANK, blurb: "Data, distributions, and dispersion." },
+];
+
+const C = {
+  void: "#0a0a0b",
+  void2: "#111113",
+  gold: "#D4AF37",
+  goldBright: "#F2D785",
+  copper: "#B8733B",
+  ivory: "#ECE8DF",
+  slate: "#8C8A8A",
+  hair: "rgba(212,175,55,0.16)",
+};
+
+function shuffleArr(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function sample(arr, n) {
+  return shuffleArr(arr).slice(0, Math.min(n, arr.length));
+}
+function fmtTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return `${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+}
+function getExamConfig(course) {
+  const total = Math.min(50, course.bank.length);
+  const minutes = Math.max(12, Math.round(total * 0.6));
+  return { total, minutes };
+}
+
+function getLocal(key, fallback) {
+  try {
+    const v = localStorage.getItem(key);
+    return v ? JSON.parse(v) : fallback;
+  } catch (e) { return fallback; }
+}
+function setLocal(key, value) {
+  try { localStorage.setItem(key, JSON.stringify(value)); return true; }
+  catch (e) { return false; }
+}
+async function fetchLeaderboard(courseId) {
+  try {
+    const res = await fetch(`/api/leaderboard?course=${encodeURIComponent(courseId)}`);
+    if (!res.ok) return [];
+    return await res.json();
+  } catch (e) { return []; }
+}
+async function postLeaderboard(courseId, entry) {
+  try {
+    const res = await fetch("/api/leaderboard", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ course: courseId, ...entry }),
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (e) { return null; }
+}
+
+function ParticleField({ intensity = 1 }) {
+  const canvasRef = React.useRef(null);
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    const reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let raf, w, h, particles = [];
+
+    function init() {
+      w = canvas.clientWidth;
+      h = canvas.clientHeight;
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+      particles = [];
+      const cols = Math.max(6, Math.floor(14 * intensity));
+      const rows = Math.max(6, Math.floor(10 * intensity));
+      for (let i = 0; i < cols; i++) {
+        for (let j = 0; j < rows; j++) {
+          const ox = w * 0.5 + (i / cols) * w * 0.48 + w * 0.02;
+          const oy = (j / rows) * h;
+          particles.push({ x: ox, y: oy, ox, oy, vx: 0, vy: 0, ordered: true });
+        }
+      }
+      const chaosCount = Math.floor(cols * rows * 0.75);
+      for (let k = 0; k < chaosCount; k++) {
+        particles.push({
+          x: Math.random() * w * 0.5, y: Math.random() * h,
+          ox: 0, oy: 0,
+          vx: (Math.random() - 0.5) * 0.5, vy: (Math.random() - 0.5) * 0.5,
+          ordered: false,
+        });
+      }
+    }
+    function step() {
+      ctx.clearRect(0, 0, w, h);
+      particles.forEach((p) => {
+        if (p.ordered) {
+          p.x += (p.ox - p.x) * 0.04;
+          p.y += (p.oy - p.y) * 0.04;
+        } else {
+          p.x += p.vx; p.y += p.vy;
+          if (p.x < 0 || p.x > w * 0.55) p.vx *= -1;
+          if (p.y < 0 || p.y > h) p.vy *= -1;
+        }
+        ctx.beginPath();
+        ctx.fillStyle = p.ordered ? "rgba(212,175,55,0.5)" : "rgba(184,115,59,0.4)";
+        ctx.arc(p.x, p.y, 1.4, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      if (!reduced) raf = requestAnimationFrame(step);
+    }
+    init();
+    step();
+    const onResize = () => init();
+    window.addEventListener("resize", onResize);
+    return () => { window.removeEventListener("resize", onResize); if (raf) cancelAnimationFrame(raf); };
+  }, [intensity]);
+  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" />;
+}
+
+function Logo({ size = 40, withWordmark = false }) {
+  return (
+    <div className="flex items-center gap-3">
+      <img src={LOGO_SRC} alt="SCY Intelligence" style={{ width: size, height: size, objectFit: "contain" }} />
+      {withWordmark && (
+        <div className="leading-tight">
+          <div className="f-display font-bold tracking-wide" style={{ color: C.ivory, fontSize: size * 0.34 }}>
+            SCY <span style={{ color: C.gold }}>INTELLIGENCE</span>
+          </div>
+          <div className="f-mono uppercase tracking-[0.2em]" style={{ color: C.slate, fontSize: size * 0.16 }}>
+            CBT Practice Studio
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function GoldButton({ children, onClick, full, variant = "solid", disabled }) {
+  const base = "f-display font-bold tracking-wide rounded-md px-6 py-3 inline-flex items-center justify-center gap-2 transition-transform active:scale-[0.98]";
+  const style = variant === "solid"
+    ? { background: `linear-gradient(135deg, ${C.goldBright}, ${C.gold})`, color: "#0a0a0b" }
+    : { background: "transparent", color: C.gold, border: `1px solid ${C.hair}` };
+  return (
+    <button onClick={onClick} disabled={disabled}
+      className={`${base} ${full ? "w-full" : ""} ${disabled ? "opacity-40 cursor-not-allowed" : "hover:brightness-110"}`}
+      style={style}>
+      {children}
+    </button>
+  );
+}
+
+function TopNav({ screen, setScreen }) {
+  return (
+    <div className="sticky top-0 z-30 backdrop-blur-md border-b" style={{ borderColor: C.hair, background: "rgba(10,10,11,0.75)" }}>
+      <div className="max-w-5xl mx-auto px-5 py-3 flex items-center justify-between">
+        <button onClick={() => setScreen("home")} className="flex items-center gap-2">
+          <Logo size={34} />
+          <span className="f-display font-bold text-sm tracking-wide hidden sm:inline" style={{ color: C.ivory }}>
+            SCY <span style={{ color: C.gold }}>INTELLIGENCE</span>
+          </span>
+        </button>
+        <div className="flex items-center gap-4 f-mono text-xs uppercase tracking-widest">
+          <button onClick={() => setScreen("courses")} className={screen === "courses" ? "" : "opacity-60"} style={{ color: C.gold }}>Courses</button>
+          <button onClick={() => setScreen("leaderboard")} className={screen === "leaderboard" ? "" : "opacity-60"} style={{ color: C.gold }}>Leaderboard</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Home({ setScreen }) {
+  const totalQuestions = COURSES.reduce((s, c) => s + c.bank.length, 0);
+  return (
+    <div>
+      <section className="relative overflow-hidden" style={{ minHeight: "78vh" }}>
+        <ParticleField intensity={1.1} />
+        <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse at 50% 30%, transparent 0%, ${C.void} 75%)` }} />
+        <div className="relative z-10 max-w-4xl mx-auto px-6 pt-20 pb-24 text-center flex flex-col items-center">
+          <Logo size={120} />
+          <h1 className="f-display font-bold mt-8 text-4xl sm:text-5xl leading-tight" style={{ color: C.ivory }}>
+            Turn exam chaos<br />into <span style={{ color: C.gold }}>mastery</span>.
+          </h1>
+          <p className="f-body mt-5 max-w-xl text-base sm:text-lg" style={{ color: C.slate }}>
+            The SCY Intelligence CBT Practice Studio — real past-question banks, timed mock exams,
+            and topic-level feedback so you walk into the real thing already calm.
+          </p>
+          <div className="flex flex-wrap gap-3 mt-8 justify-center">
+            <GoldButton onClick={() => setScreen("courses")}>Start Practicing</GoldButton>
+            <GoldButton onClick={() => setScreen("leaderboard")} variant="ghost">View Leaderboard</GoldButton>
+          </div>
+          <div className="grid grid-cols-3 gap-4 mt-14 w-full max-w-md">
+            {[[COURSES.length, "Courses"], [totalQuestions, "Questions"], ["50", "Per Exam"]].map(([num, label]) => (
+              <div key={label} className="rounded-lg py-4" style={{ border: `1px solid ${C.hair}`, background: "rgba(255,255,255,0.02)" }}>
+                <div className="f-mono font-bold text-2xl" style={{ color: C.gold }}>{num}</div>
+                <div className="f-mono text-[10px] uppercase tracking-widest mt-1" style={{ color: C.slate }}>{label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+      <section className="max-w-5xl mx-auto px-6 py-16">
+        <h2 className="f-display font-bold text-2xl text-center mb-10" style={{ color: C.ivory }}>Built for how you actually study</h2>
+        <div className="grid sm:grid-cols-3 gap-5">
+          {[
+            ["Real past questions", "Pulled straight from compiled course CA/CBT banks, not generic filler."],
+            ["Timed, randomized", "Every attempt pulls a fresh shuffled set so you cannot just memorize the order."],
+            ["Topic-level feedback", "See exactly which topics are weak instead of one flat percentage."],
+          ].map(([t, d]) => (
+            <div key={t} className="rounded-lg p-5" style={{ border: `1px solid ${C.hair}`, background: "rgba(255,255,255,0.02)" }}>
+              <div className="f-display font-bold text-sm mb-2" style={{ color: C.gold }}>{t}</div>
+              <div className="f-body text-sm leading-relaxed" style={{ color: C.slate }}>{d}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+      <footer className="text-center py-8 f-mono text-[11px] uppercase tracking-widest" style={{ color: C.slate }}>
+        SCY Intelligence — Intelligent Solutions. Limitless Possibilities.
+      </footer>
+    </div>
+  );
+}
+
+function CourseList({ setScreen, setActiveCourse }) {
+  return (
+    <div className="max-w-4xl mx-auto px-6 py-14">
+      <h1 className="f-display font-bold text-3xl mb-2" style={{ color: C.ivory }}>Choose a course</h1>
+      <p className="f-body text-sm mb-8" style={{ color: C.slate }}>Pick a course to start a timed practice exam.</p>
+      <div className="grid sm:grid-cols-3 gap-5">
+        {COURSES.map((c) => (
+          <button key={c.id} onClick={() => { setActiveCourse(c); setScreen("instructions"); }}
+            className="text-left rounded-xl p-6 transition-transform hover:-translate-y-1"
+            style={{ border: `1px solid ${C.hair}`, background: "rgba(255,255,255,0.02)" }}>
+            <div className="f-display font-bold text-3xl mb-3" style={{ color: C.gold }}>{c.glyph}</div>
+            <div className="f-mono text-xs uppercase tracking-widest" style={{ color: C.slate }}>{c.code}</div>
+            <div className="f-display font-bold text-lg mt-1" style={{ color: C.ivory }}>{c.title}</div>
+            <div className="f-body text-sm mt-2" style={{ color: C.slate }}>{c.blurb}</div>
+            <div className="f-mono text-[11px] mt-4" style={{ color: C.gold }}>{c.bank.length} questions in bank →</div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Instructions({ course, setScreen, onStart }) {
+  const cfg = getExamConfig(course);
+  return (
+    <div className="max-w-2xl mx-auto px-6 py-14">
+      <button onClick={() => setScreen("courses")} className="f-mono text-xs mb-6" style={{ color: C.slate }}>&larr; Back to courses</button>
+      <div className="f-display font-bold text-2xl mb-1" style={{ color: C.ivory }}>{course.code} — {course.title}</div>
+      <p className="f-body text-sm mb-8" style={{ color: C.slate }}>Read the rules before you begin.</p>
+      <div className="grid grid-cols-2 gap-4 mb-8">
+        {[[cfg.total, "Questions"], [`${cfg.minutes}:00`, "Time Limit"], ["A–D", "Per Question"], ["1", "Point Each"]].map(([v, l]) => (
+          <div key={l} className="rounded-lg py-4 text-center" style={{ border: `1px solid ${C.hair}` }}>
+            <div className="f-mono font-bold text-xl" style={{ color: C.gold }}>{v}</div>
+            <div className="f-mono text-[10px] uppercase tracking-widest mt-1" style={{ color: C.slate }}>{l}</div>
+          </div>
+        ))}
+      </div>
+      <ul className="f-body text-sm space-y-2 mb-10" style={{ color: C.slate }}>
+        <li>• Questions are pulled randomly from the {course.id} question bank — every attempt is different.</li>
+        <li>• The exam auto-submits when the timer hits zero.</li>
+        <li>• You can move freely between questions using the grid before submitting.</li>
+        <li>• Your topic-level breakdown is shown right after you submit.</li>
+      </ul>
+      <GoldButton full onClick={onStart}>Begin Exam</GoldButton>
+    </div>
+  );
+}
+
+function Exam({ course, questions, currentIdx, setCurrentIdx, answers, setAnswers, timeLeft, onSubmitRequest }) {
+  const q = questions[currentIdx];
+  const answeredCount = Object.keys(answers).length;
+  const low = timeLeft < 60;
+  return (
+    <div className="max-w-3xl mx-auto px-5 py-6">
+      <div className="flex items-center justify-between mb-5">
+        <div className="f-mono text-xs uppercase tracking-widest" style={{ color: C.slate }}>{course.code}</div>
+        <div className={`f-mono font-bold text-lg ${low ? "scy-pulse" : ""}`} style={{ color: low ? C.copper : C.gold }}>
+          ⏱ {fmtTime(timeLeft)}
+        </div>
+      </div>
+      <div className="flex flex-wrap gap-1.5 mb-6">
+        {questions.map((_, i) => {
+          const isAnswered = answers[i] !== undefined;
+          const isCurrent = i === currentIdx;
+          return (
+            <button key={i} onClick={() => setCurrentIdx(i)} className="f-mono text-[11px] w-7 h-7 rounded flex items-center justify-center"
+              style={{
+                background: isCurrent ? C.gold : isAnswered ? "rgba(212,175,55,0.18)" : "transparent",
+                color: isCurrent ? "#0a0a0b" : isAnswered ? C.gold : C.slate,
+                border: `1px solid ${isCurrent ? C.gold : C.hair}`,
+              }}>
+              {i + 1}
+            </button>
+          );
+        })}
+      </div>
+      <div className="f-mono text-xs mb-2" style={{ color: C.slate }}>Question {currentIdx + 1} of {questions.length} · {answeredCount} answered</div>
+      <div className="rounded-xl p-6 mb-6" style={{ border: `1px solid ${C.hair}`, background: "rgba(255,255,255,0.02)" }}>
+        <div className="f-body text-lg leading-relaxed mb-6" style={{ color: C.ivory }}>{q.q}</div>
+        <div className="space-y-3">
+          {q.options.map((opt, i) => {
+            const selected = answers[currentIdx] === i;
+            return (
+              <button key={i} onClick={() => setAnswers((prev) => ({ ...prev, [currentIdx]: i }))}
+                className="w-full text-left rounded-lg px-4 py-3 f-body text-sm flex gap-3 items-start"
+                style={{ border: `1px solid ${selected ? C.gold : C.hair}`, background: selected ? "rgba(212,175,55,0.1)" : "transparent", color: C.ivory }}>
+                <span className="f-mono font-bold" style={{ color: selected ? C.gold : C.slate }}>{String.fromCharCode(65 + i)}</span>
+                <span>{opt}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      <div className="flex items-center justify-between">
+        <GoldButton variant="ghost" disabled={currentIdx === 0} onClick={() => setCurrentIdx((i) => Math.max(0, i - 1))}>&larr; Prev</GoldButton>
+        {currentIdx === questions.length - 1 ? (
+          <GoldButton onClick={onSubmitRequest}>Submit Exam</GoldButton>
+        ) : (
+          <GoldButton onClick={() => setCurrentIdx((i) => Math.min(questions.length - 1, i + 1))}>Next &rarr;</GoldButton>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function SubmitModal({ answeredCount, total, onCancel, onConfirm }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-6" style={{ background: "rgba(0,0,0,0.7)" }}>
+      <div className="rounded-xl p-6 max-w-sm w-full" style={{ background: C.void2, border: `1px solid ${C.hair}` }}>
+        <div className="f-display font-bold text-lg mb-2" style={{ color: C.ivory }}>Submit exam?</div>
+        <p className="f-body text-sm mb-6" style={{ color: C.slate }}>
+          You have answered {answeredCount} of {total} questions. Unanswered questions will be marked incorrect.
+        </p>
+        <div className="flex gap-3">
+          <GoldButton variant="ghost" full onClick={onCancel}>Keep Going</GoldButton>
+          <GoldButton full onClick={onConfirm}>Submit</GoldButton>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Results({ course, questions, answers, timeUsed, setScreen, onRetake, leaderboardSaved, onSaveLeaderboard, savingName, setSavingName }) {
+  const total = questions.length;
+  let correctCount = 0;
+  const topicMap = {};
+  questions.forEach((q, i) => {
+    const isCorrect = answers[i] === q.correct;
+    if (isCorrect) correctCount++;
+    if (!topicMap[q.topic]) topicMap[q.topic] = { correct: 0, total: 0 };
+    topicMap[q.topic].total++;
+    if (isCorrect) topicMap[q.topic].correct++;
+  });
+  const percent = Math.round((correctCount / total) * 100);
+  const topics = Object.entries(topicMap).sort((a, b) => a[1].correct / a[1].total - b[1].correct / b[1].total);
+  return (
+    <div className="max-w-2xl mx-auto px-6 py-14">
+      <div className="text-center mb-10">
+        <div className="f-mono text-xs uppercase tracking-widest mb-2" style={{ color: C.slate }}>{course.code} Result</div>
+        <div className="f-display font-bold text-6xl" style={{ color: percent >= 50 ? C.gold : C.copper }}>{percent}%</div>
+        <div className="f-body text-sm mt-2" style={{ color: C.slate }}>{correctCount} / {total} correct · {fmtTime(timeUsed)} used</div>
+      </div>
+      <div className="mb-10">
+        <div className="f-display font-bold text-sm mb-4" style={{ color: C.ivory }}>Topic breakdown</div>
+        <div className="space-y-3">
+          {topics.map(([topic, t]) => {
+            const pct = Math.round((t.correct / t.total) * 100);
+            return (
+              <div key={topic}>
+                <div className="flex justify-between f-body text-xs mb-1" style={{ color: C.slate }}>
+                  <span>{topic}</span><span className="f-mono">{t.correct}/{t.total}</span>
+                </div>
+                <div className="h-2 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
+                  <div className="h-full rounded-full" style={{ width: `${pct}%`, background: pct >= 60 ? `linear-gradient(90deg, ${C.gold}, ${C.goldBright})` : C.copper }} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      {!leaderboardSaved ? (
+        <div className="rounded-lg p-4 mb-6" style={{ border: `1px solid ${C.hair}` }}>
+          <div className="f-body text-sm mb-3" style={{ color: C.ivory }}>Post this score to the leaderboard?</div>
+          <div className="flex gap-2">
+            <input value={savingName} onChange={(e) => setSavingName(e.target.value)} placeholder="Your name" maxLength={24}
+              className="flex-1 f-body text-sm rounded-md px-3 py-2 outline-none"
+              style={{ background: "rgba(255,255,255,0.04)", color: C.ivory, border: `1px solid ${C.hair}` }} />
+            <GoldButton onClick={() => onSaveLeaderboard(percent, correctCount, total)} disabled={!savingName.trim()}>Save</GoldButton>
+          </div>
+        </div>
+      ) : (
+        <div className="f-body text-sm mb-6" style={{ color: C.gold }}>✓ Saved to leaderboard</div>
+      )}
+      <div className="grid grid-cols-2 gap-3">
+        <GoldButton variant="ghost" onClick={onRetake}>↻ Retake</GoldButton>
+        <GoldButton onClick={() => setScreen("leaderboard")}>🏆 Leaderboard</GoldButton>
+      </div>
+      <button onClick={() => setScreen("courses")} className="w-full text-center f-mono text-xs mt-5" style={{ color: C.slate }}>&larr; Back to all courses</button>
+    </div>
+  );
+}
+
+function Leaderboard() {
+  const [activeId, setActiveId] = React.useState(COURSES[0].id);
+  const [data, setData] = React.useState({});
+  const [loading, setLoading] = React.useState(true);
+  React.useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      const result = await fetchLeaderboard(activeId);
+      if (!cancelled) { setData((prev) => ({ ...prev, [activeId]: result })); setLoading(false); }
+    })();
+    return () => { cancelled = true; };
+  }, [activeId]);
+  const entries = (data[activeId] || []).slice().sort((a, b) => b.percent - a.percent);
+  return (
+    <div className="max-w-2xl mx-auto px-6 py-14">
+      <h1 className="f-display font-bold text-3xl mb-2" style={{ color: C.ivory }}>Leaderboard</h1>
+      <p className="f-body text-sm mb-8" style={{ color: C.slate }}>Top scores shared by everyone using this app.</p>
+      <div className="flex gap-2 mb-6">
+        {COURSES.map((c) => (
+          <button key={c.id} onClick={() => setActiveId(c.id)} className="f-mono text-xs px-3 py-1.5 rounded-full uppercase tracking-widest"
+            style={{ background: activeId === c.id ? C.gold : "transparent", color: activeId === c.id ? "#0a0a0b" : C.slate, border: `1px solid ${activeId === c.id ? C.gold : C.hair}` }}>
+            {c.id}
+          </button>
+        ))}
+      </div>
+      {loading ? (
+        <div className="f-body text-sm" style={{ color: C.slate }}>Loading...</div>
+      ) : entries.length === 0 ? (
+        <div className="f-body text-sm" style={{ color: C.slate }}>No scores yet for this course — be the first.</div>
+      ) : (
+        <div className="space-y-2">
+          {entries.map((e, i) => (
+            <div key={i} className="flex items-center justify-between rounded-lg px-4 py-3" style={{ border: `1px solid ${C.hair}` }}>
+              <div className="flex items-center gap-3">
+                <div className="f-mono font-bold w-6" style={{ color: i < 3 ? C.gold : C.slate }}>{i + 1}</div>
+                <div className="f-body text-sm" style={{ color: C.ivory }}>{e.name}</div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="f-mono text-xs" style={{ color: C.slate }}>{e.score}/{e.total}</div>
+                <div className="f-mono font-bold text-sm" style={{ color: C.gold }}>{e.percent}%</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function App() {
+  const [screen, setScreen] = React.useState("home");
+  const [activeCourse, setActiveCourse] = React.useState(null);
+  const [examQuestions, setExamQuestions] = React.useState([]);
+  const [currentIdx, setCurrentIdx] = React.useState(0);
+  const [answers, setAnswers] = React.useState({});
+  const [timeLeft, setTimeLeft] = React.useState(0);
+  const [showSubmitModal, setShowSubmitModal] = React.useState(false);
+  const [examStartedAt, setExamStartedAt] = React.useState(null);
+  const [timeUsed, setTimeUsed] = React.useState(0);
+  const [leaderboardSaved, setLeaderboardSaved] = React.useState(false);
+  const [savingName, setSavingName] = React.useState("");
+
+  React.useEffect(() => {
+    const name = getLocal("profile:name", "");
+    if (name) setSavingName(name);
+  }, []);
+
+  React.useEffect(() => {
+    if (screen !== "exam") return;
+    if (timeLeft <= 0) { handleSubmit(); return; }
+    const t = setTimeout(() => setTimeLeft((s) => s - 1), 1000);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line
+  }, [screen, timeLeft]);
+
+  function startExam() {
+    const cfg = getExamConfig(activeCourse);
+    const chosen = sample(activeCourse.bank, cfg.total);
+    const prepped = chosen.map((q) => {
+      const order = shuffleArr(q.options.map((_, i) => i));
+      return { q: q.q, topic: q.topic, options: order.map((i) => q.options[i]), correct: order.indexOf(q.correct) };
+    });
+    setExamQuestions(prepped);
+    setCurrentIdx(0);
+    setAnswers({});
+    setTimeLeft(cfg.minutes * 60);
+    setExamStartedAt(Date.now());
+    setLeaderboardSaved(false);
+    setScreen("exam");
+  }
+
+  function handleSubmit() {
+    const used = examStartedAt ? Math.round((Date.now() - examStartedAt) / 1000) : 0;
+    setTimeUsed(used);
+    setShowSubmitModal(false);
+    saveHistoryEntry(used);
+    setScreen("results");
+  }
+
+  function saveHistoryEntry(used) {
+    if (!activeCourse) return;
+    let correct = 0;
+    examQuestions.forEach((q, i) => { if (answers[i] === q.correct) correct++; });
+    const percent = Math.round((correct / examQuestions.length) * 100);
+    const entry = { date: new Date().toISOString(), score: correct, total: examQuestions.length, percent, timeUsed: used };
+    const current = getLocal("history:" + activeCourse.id, []);
+    setLocal("history:" + activeCourse.id, [entry, ...current].slice(0, 20));
+  }
+
+  async function handleSaveLeaderboard(percent, score, total) {
+    if (!activeCourse || !savingName.trim()) return;
+    setLocal("profile:name", savingName.trim());
+    const result = await postLeaderboard(activeCourse.id, { name: savingName.trim(), score, total, percent });
+    if (result) setLeaderboardSaved(true);
+  }
+
+  let body;
+  if (screen === "home") body = <Home setScreen={setScreen} />;
+  else if (screen === "courses") body = <CourseList setScreen={setScreen} setActiveCourse={setActiveCourse} />;
+  else if (screen === "instructions" && activeCourse) body = <Instructions course={activeCourse} setScreen={setScreen} onStart={startExam} />;
+  else if (screen === "exam" && examQuestions.length > 0)
+    body = <Exam course={activeCourse} questions={examQuestions} currentIdx={currentIdx} setCurrentIdx={setCurrentIdx}
+      answers={answers} setAnswers={setAnswers} timeLeft={timeLeft} onSubmitRequest={() => setShowSubmitModal(true)} />;
+  else if (screen === "results" && activeCourse)
+    body = <Results course={activeCourse} questions={examQuestions} answers={answers} timeUsed={timeUsed} setScreen={setScreen}
+      onRetake={startExam} leaderboardSaved={leaderboardSaved} onSaveLeaderboard={handleSaveLeaderboard}
+      savingName={savingName} setSavingName={setSavingName} />;
+  else if (screen === "leaderboard") body = <Leaderboard />;
+  else body = <Home setScreen={setScreen} />;
+
+  return (
+    <div className="min-h-screen f-body" style={{ background: C.void, color: C.ivory }}>
+      <TopNav screen={screen} setScreen={setScreen} />
+      {body}
+      {showSubmitModal && (
+        <SubmitModal answeredCount={Object.keys(answers).length} total={examQuestions.length}
+          onCancel={() => setShowSubmitModal(false)} onConfirm={handleSubmit} />
+      )}
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
+</script>
+</body>
+</html>
